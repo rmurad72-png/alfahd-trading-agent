@@ -45,12 +45,13 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 "
             f"وكيلك الذكي للتداول
-"
-            f"باقتك: {tier_name}
-
-"
-            f"📋 *الأوامر:*
-"
+    msg = (
+        f"🐆 *أهلاً بك في الفهد!*\n\n"
+        f"وكيلك الذكي للتداول\n"
+        f"باقتك: {tier_name}\n\n"
+        f"📋 *الأوامر:*\n"
+        f"• /wallet — محفظتك\n"
+    )
             f"• /wallet — محفظتك
 "
             f"• /execute — صفقة فورية
