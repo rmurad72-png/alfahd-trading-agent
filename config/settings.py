@@ -1,11 +1,10 @@
 """
 ⚙️ الفهد — إعدادات النظام
-Pydantic Settings v2 — validation + type safety
+Pydantic Settings v2 — مع قيم افتراضية للمرونة
 """
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, field_validator
 from typing import List, Optional
-import os
 
 
 class Settings(BaseSettings):
@@ -16,16 +15,16 @@ class Settings(BaseSettings):
     )
 
     # === Telegram ===
-    TELEGRAM_BOT_TOKEN: str = Field(..., min_length=20)
-    ADMIN_ID: int = Field(..., gt=0)
+    TELEGRAM_BOT_TOKEN: str = Field(default="")
+    ADMIN_ID: int = Field(default=0)
     MODERATOR_IDS: List[int] = Field(default_factory=list)
 
     # === Database ===
-    DATABASE_URL: str = Field(..., pattern=r"^postgresql\+asyncpg://")
-    REDIS_URL: str = Field(default="redis://localhost:6379")
+    DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./alfahd.db")
+    REDIS_URL: str = Field(default="")
 
     # === Security ===
-    MASTER_KEY: str = Field(..., min_length=32)
+    MASTER_KEY: str = Field(default="")
 
     # === AI ===
     HF_API_TOKEN: Optional[str] = Field(default=None)
@@ -33,7 +32,7 @@ class Settings(BaseSettings):
 
     # === Railway ===
     RAILWAY_ENVIRONMENT: str = Field(default="development")
-    PORT: int = Field(default=8080, ge=1000, le=65535)
+    PORT: int = Field(default=8080)
 
     # === Logging ===
     LOG_LEVEL: str = Field(default="INFO")
@@ -49,11 +48,9 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.RAILWAY_ENVIRONMENT.lower() == "production"
 
-    @property
     def is_admin(self, user_id: int) -> bool:
         return user_id == self.ADMIN_ID
 
-    @property
     def is_moderator(self, user_id: int) -> bool:
         return user_id == self.ADMIN_ID or user_id in self.MODERATOR_IDS
 
