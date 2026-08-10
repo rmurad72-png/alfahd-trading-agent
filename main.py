@@ -4,6 +4,7 @@
 import asyncio
 import logging
 import sys
+from datetime import datetime, timezone  # ← هنا (قبل الـ import المفتوح)
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -12,7 +13,6 @@ from config.settings import settings
 from security.vault import init_vault
 from core.engine import engine
 from handlers import (
-from datetime import datetime, timezone
     cmd_start, cmd_help, cmd_wallet, cmd_execute,
     cmd_vtrades, cmd_live, cmd_upgrade, cmd_premium,
     cmd_risk, cmd_killswitch, cmd_autotrade, cmd_admin,
