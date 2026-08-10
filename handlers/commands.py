@@ -52,33 +52,29 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }.get(user.tier, "🆓 مجاني")
 
         msg = (
-            f"""🐆 *أهلاً بك في الفهد!*
-
-وكيلك الذكي للتداول
-باقتك: {tier_name}
-
-📋 *الأوامر:*
-• /wallet — محفظتك
-• /execute — صفقة فورية
-• /vtrades — صفقاتك
-• /live — ربط منصة
-• /upgrade — الباقات
-• /help — المساعدة"""
+            f"🐆 *أهلاً بك في الفهد!*\n\n"
+            f"وكيلك الذكي للتداول\n"
+            f"باقتك: {tier_name}\n\n"
+            f"📋 *الأوامر:*\n"
+            f"• /wallet — محفظتك\n"
+            f"• /execute — صفقة فورية\n"
+            f"• /vtrades — صفقاتك\n"
+            f"• /live — ربط منصة\n"
+            f"• /upgrade — الباقات\n"
+            f"• /help — المساعدة"
         )
     except Exception as e:
         logger.error(f"Start error: {e}")
         msg = (
-            f"""🐆 *أهلاً بك في الفهد!*
-
-وكيلك الذكي للتداول
-
-📋 *الأوامر:*
-• /wallet — محفظتك
-• /execute — صفقة فورية
-• /vtrades — صفقاتك
-• /live — ربط منصة
-• /upgrade — الباقات
-• /help — المساعدة"""
+            "🐆 *أهلاً بك في الفهد!*\n\n"
+            "وكيلك الذكي للتداول\n\n"
+            "📋 *الأوامر:*\n"
+            "• /wallet — محفظتك\n"
+            "• /execute — صفقة فورية\n"
+            "• /vtrades — صفقاتك\n"
+            "• /live — ربط منصة\n"
+            "• /upgrade — الباقات\n"
+            "• /help — المساعدة"
         )
 
     await update.message.reply_text(msg, parse_mode="Markdown")
@@ -89,22 +85,18 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """المساعدة"""
     msg = (
-        """🐆 *الفهد — دليل الاستخدام*
-
-📊 *التداول:*
-`/execute BTC buy 500` — شراء
-`/execute ETH sell 300` — بيع
-
-💼 *المحفظة:*
-`/wallet` — الرصيد
-`/vtrades` — الصفقات
-
-⚙️ *الإعدادات:*
-`/live connect okx KEY SECRET`
-`/live off` — فصل المنصة
-
-💎 *الباقات:*
-`/upgrade` — عرض الباقات"""
+        "🐆 *الفهد — دليل الاستخدام*\n\n"
+        "📊 *التداول:*\n"
+        "`/execute BTC buy 500` — شراء\n"
+        "`/execute ETH sell 300` — بيع\n\n"
+        "💼 *المحفظة:*\n"
+        "`/wallet` — الرصيد\n"
+        "`/vtrades` — الصفقات\n\n"
+        "⚙️ *الإعدادات:*\n"
+        "`/live connect okx KEY SECRET`\n"
+        "`/live off` — فصل المنصة\n\n"
+        "💎 *الباقات:*\n"
+        "`/upgrade` — عرض الباقات"
     )
     await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -122,22 +114,18 @@ async def cmd_wallet(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         msg = (
-            f"""💼 *محفظتك — الفهد*
-━━━━━━━━━━━━━━━━━━
-💵 رصيد: ${summary['balance']:,.2f}
-📊 مستثمر: ${summary['invested']:,.2f}
-💰 إجمالي: ${summary['total_value']:,.2f}
-📈 صافي الربح: ${summary['total_pnl']:+,.2f}
-🎯 مراكز: {summary['open_positions']}
-💎 باقة: {summary['tier']}"""
+            f"💼 *محفظتك — الفهد*\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"💵 رصيد: ${summary['balance']:,.2f}\n"
+            f"📊 مستثمر: ${summary['invested']:,.2f}\n"
+            f"💰 إجمالي: ${summary['total_value']:,.2f}\n"
+            f"📈 صافي الربح: ${summary['total_pnl']:+,.2f}\n"
+            f"🎯 مراكز: {summary['open_positions']}\n"
+            f"💎 باقة: {summary['tier']}"
         )
 
         if summary.get('risk_alerts'):
-            msg += "
-
-⚠️ *تنبيهات:*
-" + "
-".join(summary['risk_alerts'])
+            msg += "\n\n⚠️ *تنبيهات:*\n" + "\n".join(summary['risk_alerts'])
     except Exception as e:
         logger.error(f"Wallet error: {e}")
         msg = "❌ خطأ في جلب البيانات — جرب لاحقاً"
@@ -154,11 +142,10 @@ async def cmd_execute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(args) < 3:
         await update.message.reply_text(
-            """⚡ *الاستخدام:*
-`/execute BTC buy 500`
-`/execute ETH sell 300`
-
-_buy = شراء | sell = بيع_""",
+            "⚡ *الاستخدام:*\n"
+            "`/execute BTC buy 500`\n"
+            "`/execute ETH sell 300`\n\n"
+            "_buy = شراء | sell = بيع_",
             parse_mode="Markdown"
         )
         return
@@ -213,21 +200,17 @@ _buy = شراء | sell = بيع_""",
         if result.get("ok"):
             risk = result.get("risk", {})
             resp = (
-                f"""✅ *تم التنفيذ!*
-
-🪙 {symbol} | {'🟢 شراء' if direction=='buy' else '🔴 بيع'}
-💰 الحجم: ${amount:,.2f}
-"""
+                f"✅ *تم التنفيذ!*\n\n"
+                f"🪙 {symbol} | {'🟢 شراء' if direction=='buy' else '🔴 بيع'}\n"
+                f"💰 الحجم: ${amount:,.2f}\n"
             )
             if risk:
                 resp += (
-                    f"""🛑 وقف الخسارة: {risk.get('sl_pct', 5)}%
-🎯 هدف الربح: {risk.get('tp_pct', 10)}%
-📊 R/R: 1:{risk.get('rr_ratio', 2)}
-"""
+                    f"🛑 وقف الخسارة: {risk.get('sl_pct', 5)}%\n"
+                    f"🎯 هدف الربح: {risk.get('tp_pct', 10)}%\n"
+                    f"📊 R/R: 1:{risk.get('rr_ratio', 2)}\n"
                 )
-            resp += "
-🎮 *وضع افتراضي*"
+            resp += "\n🎮 *وضع افتراضي*"
         else:
             resp = result.get("msg", "❌ فشل التنفيذ")
 
@@ -257,9 +240,8 @@ async def cmd_vtrades(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not wallet_db or not wallet_db.get("positions"):
             await update.message.reply_text(
-                """📋 *ما عندك صفقات مفتوحة*
-
-افتح صفقة: `/execute BTC buy 500`""",
+                "📋 *ما عندك صفقات مفتوحة*\n\n"
+                "افتح صفقة: `/execute BTC buy 500`",
                 parse_mode="Markdown"
             )
             return
@@ -277,19 +259,16 @@ async def cmd_vtrades(update: Update, context: ContextTypes.DEFAULT_TYPE):
             emoji = "🟢" if pnl >= 0 else "🔴"
 
             lines.append(
-                f"""{emoji} *{sym}*
-• دخول: ${pos['avg_price']:,.4f}
-• الحالي: ${current:,.4f}
-• PnL: {sign}${pnl:,.2f} ({sign}{pnl_pct:.1f}%)
-• TP: ${pos.get('take_profit', 0):,.4f} | SL: ${pos.get('stop_loss', 0):,.4f}
-"""
+                f"{emoji} *{sym}*\n"
+                f"• دخول: ${pos['avg_price']:,.4f}\n"
+                f"• الحالي: ${current:,.4f}\n"
+                f"• PnL: {sign}${pnl:,.2f} ({sign}{pnl_pct:.1f}%)\n"
+                f"• TP: ${pos.get('take_profit', 0):,.4f} | SL: ${pos.get('stop_loss', 0):,.4f}\n"
             )
 
-        lines.append(f"
-💵 الرصيد: ${wallet_db['balance']:,.2f}")
+        lines.append(f"\n💵 الرصيد: ${wallet_db['balance']:,.2f}")
 
-        await update.message.reply_text("
-".join(lines), parse_mode="Markdown")
+        await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
     except Exception as e:
         logger.error(f"Vtrades error: {e}")
         await update.message.reply_text("❌ خطأ في جلب الصفقات")
@@ -312,9 +291,8 @@ async def cmd_live(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"🏦 *متصل بـ {ex_name}* ✅\nالوضع: {mode}")
         else:
             await update.message.reply_text(
-                """🎮 *وضع افتراضي*
-
-للربط: `/live connect okx KEY SECRET`"""
+                "🎮 *وضع افتراضي*\n\n"
+                "للربط: `/live connect okx KEY SECRET`"
             )
         return
 
@@ -326,8 +304,8 @@ async def cmd_live(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if action == "connect":
         if len(args) < 4:
             await update.message.reply_text(
-                """⚠️ *الاستخدام:*
-`/live connect okx KEY SECRET [PASSPHRASE]`"""
+                "⚠️ *الاستخدام:*\n"
+                "`/live connect okx KEY SECRET [PASSPHRASE]`"
             )
             return
 
@@ -351,10 +329,9 @@ async def cmd_live(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if success:
                 mode = "🧪 DEMO" if settings.PAPER_TRADING else "🔴 LIVE"
                 await msg.edit_text(
-                    f"""✅ *تم الربط بـ {ex_name.upper()}* 🏦
-
-الوضع: {mode}
-الآن يمكنك التداول!"""
+                    f"✅ *تم الربط بـ {ex_name.upper()}* 🏦\n\n"
+                    f"الوضع: {mode}\n"
+                    f"الآن يمكنك التداول!"
                 )
             else:
                 await msg.edit_text("❌ *فشل الاتصال* — تحقق من API Keys")
@@ -371,26 +348,21 @@ async def cmd_live(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_upgrade(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """عرض الباقات"""
     msg = (
-        """💎 *باقات الفهد*
-━━━━━━━━━━━━━━━━━━
-
-🆓 *مجاني — $0*
-• 30 عملة | 3 صفقات/يوم
-• 15% تعرض max
-
-🥈 *فضي — $19/شهر*
-• 100 عملة | 5 صفقات/يوم
-• 25% تعرض max
-
-🥇 *ذهبي — $49/شهر*
-• 150 عملة + أصول المنصة
-• 35% تعرض max
-
-💎 *ماسي — $199/شهر*
-• 300 عملة + جميع الأصول
-• 10 يومي / 5 أسبوعي / 10 شهري
-
-📩 للاشتراك: تواصل مع @admin"""
+        "💎 *باقات الفهد*\n"
+        "━━━━━━━━━━━━━━━━━━\n\n"
+        "🆓 *مجاني — $0*\n"
+        "• 30 عملة | 3 صفقات/يوم\n"
+        "• 15% تعرض max\n\n"
+        "🥈 *فضي — $19/شهر*\n"
+        "• 100 عملة | 5 صفقات/يوم\n"
+        "• 25% تعرض max\n\n"
+        "🥇 *ذهبي — $49/شهر*\n"
+        "• 150 عملة + أصول المنصة\n"
+        "• 35% تعرض max\n\n"
+        "💎 *ماسي — $199/شهر*\n"
+        "• 300 عملة + جميع الأصول\n"
+        "• 10 يومي / 5 أسبوعي / 10 شهري\n\n"
+        "📩 للاشتراك: تواصل مع @admin"
     )
     await update.message.reply_text(msg, parse_mode="Markdown")
 
@@ -448,20 +420,17 @@ async def cmd_risk(update: Update, context: ContextTypes.DEFAULT_TYPE):
         drawdown = abs(summary.get('total_pnl', 0)) / max(summary.get('total_value', 1), 1) * 100
 
         msg = (
-            f"""⚖️ *حالة المخاطر*
-━━━━━━━━━━━━━━━━━━
-📉 Drawdown: {drawdown:.1f}%
-📊 مراكز: {summary.get('open_positions', 0)}
-💎 باقة: {summary.get('tier', 'مجاني')}
-"""
+            f"⚖️ *حالة المخاطر*\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"📉 Drawdown: {drawdown:.1f}%\n"
+            f"📊 مراكز: {summary.get('open_positions', 0)}\n"
+            f"💎 باقة: {summary.get('tier', 'مجاني')}\n"
         )
 
         if summary.get('is_healthy'):
-            msg += "
-✅ *المحفظة صحية*"
+            msg += "\n✅ *المحفظة صحية*"
         else:
-            msg += "
-⚠️ *هناك تنبيهات*"
+            msg += "\n⚠️ *هناك تنبيهات*"
     except Exception as e:
         logger.error(f"Risk error: {e}")
         msg = "❌ خطأ في جلب البيانات"
@@ -484,10 +453,9 @@ async def cmd_killswitch(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("✅ Kill Switch مُعاد تعيينه")
     else:
         await update.message.reply_text(
-            """🛑 *Kill Switch*
-
-للإيقاف: `/killswitch trigger`
-للإعادة: `/killswitch reset`"""
+            "🛑 *Kill Switch*\n\n"
+            "للإيقاف: `/killswitch trigger`\n"
+            "للإعادة: `/killswitch reset`"
         )
 
 
@@ -500,17 +468,16 @@ async def cmd_autotrade(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if action in ("on", "تشغيل"):
         await update.message.reply_text(
-            """🤖 *التداول الآلي مُفعَّل*
-
-سأرسل لك إشارات للموافقة عليها."""
+            "🤖 *التداول الآلي مُفعَّل*\n\n"
+            "سأرسل لك إشارات للموافقة عليها."
         )
     elif action in ("off", "إيقاف"):
         await update.message.reply_text("⏹️ *التداول الآلي مُوقَّف*")
     else:
         await update.message.reply_text(
-            """🤖 *التداول الآلي*
-الحالة: ❌ موقف
-للتفعيل: `/autotrade on`"""
+            "🤖 *التداول الآلي*\n"
+            "الحالة: ❌ موقف\n"
+            "للتفعيل: `/autotrade on`"
         )
 
 
@@ -525,10 +492,9 @@ async def cmd_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        """👑 *لوحة المدير*
-
-`/premium add USER_ID tier`
-`/broadcast رسالة`"""
+        "👑 *لوحة المدير*\n\n"
+        "`/premium add USER_ID tier`\n"
+        "`/broadcast رسالة`"
     )
 
 
