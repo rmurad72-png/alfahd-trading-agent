@@ -14,4 +14,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Run the bot
+# Copy app
+COPY . .
+
+# ✅ أضف هذا السطر (لإجبار rebuild + للتأكد من وجود الملفات)
+RUN ls -la /app && test -f /app/main.py
+
+# Run the bot
+CMD ["python", "main.py"]
 CMD ["python", "main.py"]
