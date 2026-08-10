@@ -30,19 +30,23 @@ class Engine:
     async def get_user(self, user_id: int) -> Optional[Dict[str, Any]]:
         return await db.get_user(user_id)
 
+    async def _ensure_wallet(self, user_id: int):
+        """ضمان وجود محفظة للمستخدم"""
+        wallet = await db.get_virtual_wallet(user_id)
+        if not wallet:
+            await db.get_or_create_user(user_id)
+            wallet = await db.get_virtual_wallet(user_id)
+        return wallet
+
     async def get_portfolio_summary(self, user_id: int) -> Dict[str, Any]:
         """ملخص المحفظة الافتراضية"""
-        user = await db.get_user(user_id)
-        wallet = await db.get_virtual_wallet(user_id)
-
-        if not wallet:
-            return {"error": "لا توجد محفظة"}
+        user = await self.get_or_create_user(user_id)
+        wallet = await self._ensure_wallet(user_id)
 
         positions = wallet.get("positions", {})
         total_invested = sum(p.get("cost", 0) for p in positions.values())
         balance = wallet.get("balance", 0)
 
-        # حساب PnL
         total_pnl = 0.0
         for sym, pos in positions.items():
             coin = sym.replace("USDT", "")
@@ -67,15 +71,12 @@ class Engine:
 
     async def execute_virtual(self, user_id: int, symbol: str, direction: str, amount: float) -> Dict[str, Any]:
         """تنفيذ صفقة افتراضية"""
-        wallet = await db.get_virtual_wallet(user_id)
-        if not wallet:
-            return {"ok": False, "msg": "❌ لا توجد محفظة"}
+        wallet = await self._ensure_wallet(user_id)
 
         if direction == "buy":
             if wallet["balance"] < amount:
                 return {"ok": False, "msg": "❌ رصيد غير كافٍ"}
 
-            # جلب السعر
             coin = symbol.replace("USDT", "")
             price_data = await data_layer.get_price(coin)
             price = price_data.get("price", 0)
@@ -86,7 +87,6 @@ class Engine:
             positions = wallet.get("positions", {})
 
             if symbol in positions:
-                # متوسط التكلفة
                 old = positions[symbol]
                 total_qty = old["quantity"] + qty
                 total_cost = old["cost"] + amount
@@ -109,7 +109,6 @@ class Engine:
             new_balance = wallet["balance"] - amount
             await db.update_virtual_wallet(user_id, new_balance, positions)
 
-            # حفظ في trades
             await db.add_trade(user_id, symbol, direction, amount, price,
                                positions[symbol]["take_profit"], positions[symbol]["stop_loss"])
 
@@ -142,12 +141,17 @@ class Engine:
             del positions[symbol]
             await db.update_virtual_wallet(user_id, new_balance, positions)
 
+            # إغلاق الصفقات المفتوحة لهذا الرمز
+            open_trades = await db.get_open_trades(user_id)
+            for t in open_trades:
+                if t["symbol"] == symbol:
+                    await db.close_trade(t["id"], pnl)
+
             return {"ok": True, "pnl": pnl}
 
         return {"ok": False, "msg": "❌ اتجاه غير معروف"}
 
     def has_live_trading(self, user_id: int) -> bool:
-        """للتبسيط — نعيد False حتى نبني exchange.py"""
         return False
 
     def disconnect_exchange(self, user_id: int):
@@ -157,7 +161,21 @@ class Engine:
         return False
 
     async def kill_switch(self, user_id: int, reason: str) -> str:
-        return "🛑 Kill Switch مُفعَّل — جميع المراكز مغلقة"
+        wallet = await self._ensure_wallet(user_id)
+        positions = wallet.get("positions", {})
+        pnl_total = 0.0
+        for sym, pos in list(positions.items()):
+            coin = sym.replace("USDT", "")
+            price_data = await data_layer.get_price(coin)
+            price = price_data.get("price", pos["avg_price"])
+            proceeds = pos["quantity"] * price
+            pnl = proceeds - pos["cost"]
+            pnl_total += pnl
+        await db.update_virtual_wallet(user_id, wallet["balance"] + sum(p.get("cost", 0) for p in positions.values()), {})
+        open_trades = await db.get_open_trades(user_id)
+        for t in open_trades:
+            await db.close_trade(t["id"], pnl_total)
+        return f"🛑 Kill Switch مُفعَّل — {len(positions)} مراكز مُغلقة"
 
 
 engine = Engine()
